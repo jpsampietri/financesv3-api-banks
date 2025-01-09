@@ -1,0 +1,31 @@
+{
+  "name": "resource",
+  "version": "1.0.0",
+  "description": "RESTFul microservice template.",
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "TEST='true' npx ts-mocha --loader=ts-node/esm ./src/test/* --extension='ts' --recursive",
+    "dev": "npx nodemon --watch \"src/**\" --ext \"ts,json\" --ignore \"src/**/*.spec.ts\" --exec \"npx tsx src/index.ts\"",
+    "build": "npx tsc"
+  },
+  "author": "jpsampietri.com",
+  "license": "AGPL-3.0",
+  "dependencies": {
+    "express": "^4.21.2",
+    "mongodb": "^6.12.0",
+    "properties-file": "^3.5.11",
+    "tsx": "^4.19.2"
+  },
+  "devDependencies": {
+    "@types/chai": "^5.0.1",
+    "@types/express": "^5.0.0",
+    "@types/mocha": "^10.0.10",
+    "chai": "^5.1.2",
+    "mocha": "^10.8.2",
+    "nodemon": "^3.1.9",
+    "ts-mocha": "^10.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.2"
+  }
+}

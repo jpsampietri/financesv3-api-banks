@@ -1,0 +1,8 @@
+db.uri=mongodb://localhost:27017
+db.name=teststandardcomponent
+db.collection=resources
+
+api.basePath=/api/v1
+api.resourcePath=/resources
+
+service.port=3000
