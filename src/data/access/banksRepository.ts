@@ -1,5 +1,5 @@
 import { MongoClient, ObjectId } from 'mongodb';
-import { Resource } from '../model/resource.js';
+import { Bank } from '../model/bank.js';
 import { Properties } from '../../service/util/properties.js';
 
 const prop = Properties.instance;
@@ -33,7 +33,7 @@ export const dbCollectionFindOne = async (_id: ObjectId) => {
     }
 }
 
-export const dbCollectionInsertOne = async (content: Resource) => {
+export const dbCollectionInsertOne = async (content: Bank) => {
     const dbclient = new MongoClient(uri);
     try {
         const collection = dbclient.db(dbName).collection(collectionName);
@@ -43,11 +43,15 @@ export const dbCollectionInsertOne = async (content: Resource) => {
     }
 }
 
-export const dbCollectionUpdateOne = async (_id: ObjectId, content: Resource) => {
+export const dbCollectionUpdateOne = async (_id: ObjectId, content: Bank) => {
     const dbclient = new MongoClient(uri);
     try {
         const collection = dbclient.db(dbName).collection(collectionName);
-        return await collection.updateOne({ _id: _id }, { $set: { requiredField: content.requiredField} });
+        const updateContent = { 
+            label: content.label,
+            color: content.color
+        };
+        return await collection.updateOne({ _id: _id }, { $set:  updateContent});
     } finally {
         dbclient.close();
     }

@@ -2,15 +2,15 @@ import { before, describe, it } from "mocha";
 import { assert } from "chai";
 import { MongoClient, ObjectId } from "mongodb";
 import { Properties } from "../../../service/util/properties.js";
-import { Resource } from "../../../data/model/resource.js";
-import { deleteOne, findAll, findOne, insertOne, updateOne } from "../../../service/controller/resourceController.js";
+import { Bank } from "../../../data/model/bank.js";
+import { deleteOne, findAll, findOne, insertOne, updateOne } from "../../../service/controller/banksController.js";
 import { APIError } from "../../../service/util/apiError.js";
 let insertOneId: ObjectId;
 
 describe('ResourceController', () => {
     describe('+insertOne()', () => {
         it('should return the created resource', async () => {
-            const result: Resource = await insertOne({ requiredField: 'testInsert' });
+            const result: Bank = await insertOne({ requiredField: 'testInsert' });
             assert.equal(result.requiredField, 'testInsert');
             insertOneId = new ObjectId(result._id);
         });
@@ -29,12 +29,12 @@ describe('ResourceController', () => {
     });
     describe('+updateOne()', () => {
         it('should return the modified resource', async () => {
-            const result = await updateOne(insertOneId.toString(), new Resource({requiredField: 'testUpdate'}));
+            const result = await updateOne(insertOneId.toString(), new Bank({requiredField: 'testUpdate'}));
             assert.equal(result.requiredField, 'testUpdate');
         });
         it('should throw an error', async () => {
             try {
-                await updateOne(insertOneId.toString(), new Resource({requiredField: 'testUpdate'}));
+                await updateOne(insertOneId.toString(), new Bank({requiredField: 'testUpdate'}));
             } catch (error) {
                 assert.instanceOf(error, APIError);
                 assert.equal(error.message, 'Did not update the resource');

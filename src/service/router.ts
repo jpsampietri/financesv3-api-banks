@@ -1,10 +1,10 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { deleteOne, findAll, findOne, insertOne, updateOne } from './controller/resourceController.js';
+import { deleteOne, findAll, findOne, insertOne, updateOne } from './controller/banksController.js';
 import { validateRequestBody, validateRequestId } from './validation/requestValidator.js';
 import { HTTPStatus } from './util/httpStatus.js';
 import { APIError } from './util/apiError.js';
 import { Properties } from './util/properties.js';
-import { Resource } from '../data/model/resource.js';
+import { Bank } from '../data/model/bank.js';
 import { ObjectId } from 'mongodb';
 
 const prop = Properties.instance;
@@ -14,13 +14,13 @@ export const router = Router();
 
 router.route(resourcePath)
     .get((request: Request, response: Response, next: NextFunction) => {
-        findAll().then((result: Resource[]) => {
+        findAll().then((result: Bank[]) => {
             response.status(HTTPStatus.OK).json(result);
         }).catch(next);
     })
     .post(validateRequestBody)
     .post((request: Request, response: Response, next: NextFunction) => {
-        insertOne(request.body).then((result: Resource) => {
+        insertOne(request.body).then((result: Bank) => {
             response.status(HTTPStatus.CREATED).json(result);
         }).catch(next);
     });
@@ -28,13 +28,13 @@ router.route(resourcePath)
 router.use(`${resourcePath}/:id`, validateRequestId);
 router.route(`${resourcePath}/:id`)
     .get((request: Request, response: Response, next: NextFunction) => {
-        findOne(request.params.id).then((result: Resource) => {
+        findOne(request.params.id).then((result: Bank) => {
             response.status(HTTPStatus.OK).json(result);
         }).catch(next);
     })
     .put(validateRequestBody)
     .put((request: Request, response: Response, next: NextFunction) => {
-        updateOne(request.params.id, request.body).then((result: Resource) => {
+        updateOne(request.params.id, request.body).then((result: Bank) => {
             response.status(HTTPStatus.OK).json(result);
         }).catch(next);
     })
@@ -56,5 +56,6 @@ router.use((request: Request, response: Response, next: NextFunction) => {
 });
 
 router.use((error: APIError, request: Request, response: Response, next: NextFunction) => {
+    console.log(error);
     response.status(error.code).json(error);
 })
