@@ -6,34 +6,9 @@ const prop = Properties.instance;
 
 const uri = prop.getProperty('db.uri');
 const dbName = prop.getProperty('db.name');
-const collectionName = prop.getProperty('db.banksCollection');
+const collectionName = prop.getProperty('db.accountsCollection');
 
-export class BanksRepository {
-    static dbCollectionFindAll = async () => {
-        const dbclient = new MongoClient(uri);
-        try {
-            const collection = dbclient.db(dbName).collection(collectionName);
-            const cursor = collection.find();
-            let data: any = [];
-            for await (const doc of cursor) {
-                data.push(doc);
-            }
-            return data;
-        } finally {
-            dbclient.close();
-        }
-    }
-
-    static dbCollectionFindOne = async (_id: ObjectId) => {
-        const dbclient = new MongoClient(uri);
-        try {
-            const collection = dbclient.db(dbName).collection(collectionName);
-            return await collection.findOne({ _id: _id });
-        } finally {
-            dbclient.close();
-        }
-    }
-
+export class AccountsRepository {
     static dbCollectionInsertOne = async (content: Bank) => {
         const dbclient = new MongoClient(uri);
         try {
