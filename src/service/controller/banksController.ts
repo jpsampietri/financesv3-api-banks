@@ -1,26 +1,25 @@
 import { ObjectId } from "mongodb";
-import { dbCollectionDeleteOne, dbCollectionFindAll, dbCollectionFindOne, dbCollectionInsertOne, dbCollectionUpdateOne } from "../../data/access/resourceRepository.js";
-import { Resource } from "../../data/model/resource.js";
-import { Request } from "express";
+import { dbCollectionDeleteOne, dbCollectionFindAll, dbCollectionFindOne, dbCollectionInsertOne, dbCollectionUpdateOne } from "../../data/access/banksRepository.js";
+import { Bank } from "../../data/model/bank.js";
 import { APIError } from "../util/apiError.js";
 import { HTTPStatus } from "../util/httpStatus.js";
 
-export const findAll = async (): Promise<Resource[]> => {
-    let resources: Resource[] = [];
+export const findAll = async (): Promise<Bank[]> => {
+    let resources: Bank[] = [];
     const opResult = await dbCollectionFindAll();
     opResult.forEach((b: any) => {
-        let resource = new Resource(b);
+        let resource = new Bank(b);
         resource.fillStandardLinks();
         resources.push(resource);
     });
     return resources;
 }
 
-export const findOne = async (id: string): Promise<Resource> => {
+export const findOne = async (id: string): Promise<Bank> => {
     const requestId = new ObjectId(id);
     const opResult = await dbCollectionFindOne(requestId);
     if (opResult) {
-        const resource = new Resource(opResult);
+        const resource = new Bank(opResult);
         resource.fillStandardLinks();
         return resource;
     } else {
@@ -28,8 +27,8 @@ export const findOne = async (id: string): Promise<Resource> => {
     }
 }
 
-export const insertOne = async (object: any): Promise<Resource> => {
-    const requestResource = new Resource({ requiredField: object.requiredField});
+export const insertOne = async (object: any): Promise<Bank> => {
+    const requestResource = new Bank({ label: object.label, color: object.color });
     const opResult = await dbCollectionInsertOne(requestResource);
     if (opResult.insertedId) {
         return findOne(opResult.insertedId.toString());
@@ -38,9 +37,9 @@ export const insertOne = async (object: any): Promise<Resource> => {
     }
 }
 
-export const updateOne = async (id: string, object: any): Promise<Resource> => {
+export const updateOne = async (id: string, object: any): Promise<Bank> => {
     const requestId = new ObjectId(id);
-    const requestResource = new Resource({ requiredField: object.requiredField});
+    const requestResource = new Bank({ label: object.label, color: object.color });
     const opResult = await dbCollectionUpdateOne(requestId, requestResource);
     if (opResult.modifiedCount === 1) {
         return findOne(id);

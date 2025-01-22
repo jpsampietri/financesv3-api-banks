@@ -1,8 +1,8 @@
 db.uri=mongodb://localhost:27017
-db.name=teststandardcomponent
-db.collection=resources
+db.name=financesv3_test
+db.collection=banks
 
 api.basePath=/api/v1
-api.resourcePath=/resources
+api.resourcePath=/banks
 
 service.port=3000

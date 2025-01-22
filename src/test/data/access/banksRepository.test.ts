@@ -1,15 +1,15 @@
 import { before, describe, it } from "mocha";
-import { dbCollectionDeleteOne, dbCollectionFindAll, dbCollectionFindOne, dbCollectionInsertOne, dbCollectionUpdateOne } from "../../../data/access/resourceRepository.js";
+import { dbCollectionDeleteOne, dbCollectionFindAll, dbCollectionFindOne, dbCollectionInsertOne, dbCollectionUpdateOne } from "../../../data/access/banksRepository.js";
 import { assert } from "chai";
-import { Resource } from "../../../data/model/resource.js";
+import { Bank } from "../../../data/model/bank.js";
 import { MongoClient, ObjectId } from "mongodb";
 import { Properties } from "../../../service/util/properties.js";
 let insertOneId: ObjectId;
 
-describe('ResourceRepository', () => {
+describe('BanksRepository', () => {
     describe('+dbCollectionInsertOne()', () => {
         it('should return the id for the created object', async () => {
-            const result = await dbCollectionInsertOne(new Resource({ requiredField: 'testInsert' }));
+            const result = await dbCollectionInsertOne(new Bank({ label: 'testInsert', color: '#FFFFFF' }));
             assert.isTrue(ObjectId.isValid(result.insertedId));
             insertOneId = result.insertedId;
         });
@@ -23,16 +23,17 @@ describe('ResourceRepository', () => {
     describe('+dbCollectionFindOne()', () => {
         it('should return the object for the given id', async () => {
             const result = await dbCollectionFindOne(insertOneId);
-            assert.equal(result?.requiredField, 'testInsert');
+            assert.equal(result?.label, 'testInsert');
+            assert.equal(result?.color, '#FFFFFF');
         });
     });
     describe('+dbCollectionUpdateOne()', () => {
         it('should return modifiedCount == 1', async () => {
-            const result = await dbCollectionUpdateOne(insertOneId, new Resource({requiredField: 'testUpdate'}));
+            const result = await dbCollectionUpdateOne(insertOneId, new Bank({label: 'testUpdate', color: '#FFFF00'}));
             assert.equal(result.modifiedCount, 1);
         });
         it('should return modifiedCount == 0', async () => {
-            const result = await dbCollectionUpdateOne(insertOneId, new Resource({requiredField: 'testUpdate'}));
+            const result = await dbCollectionUpdateOne(insertOneId, new Bank({label: 'testUpdate', color: '#FFFF00'}));
             assert.equal(result.modifiedCount, 0);
         });
     });
