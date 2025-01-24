@@ -1,3 +1,5 @@
+import { APIError } from "../../service/util/apiError.js";
+import { HTTPStatus } from "../../service/util/httpStatus.js";
 import { Properties } from "../../service/util/properties.js";
 import { Account, AccountType, CreditAccount, CurrentAccount, SavingsAccount } from "./account.js";
 import { APIMethod, APIResource } from "./apiResource.js";
@@ -32,9 +34,8 @@ export class Bank extends APIResource {
                         account = new SavingsAccount(a);
                         this.accounts.push(account);
                         break;
-
                     default:
-                        break;
+                        throw new APIError(HTTPStatus.INTERNAL_SERVER_ERROR, `Uknown account type ${a.type}`);
                 }
             });
         }

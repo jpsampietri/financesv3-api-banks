@@ -1,6 +1,7 @@
-import { MongoClient, ObjectId } from 'mongodb';
+import { Collection, MongoClient, ObjectId, UpdateResult } from 'mongodb';
 import { Bank } from '../model/bank.js';
 import { Properties } from '../../service/util/properties.js';
+import { Account } from '../model/account.js';
 
 const prop = Properties.instance;
 
@@ -9,38 +10,69 @@ const dbName = prop.getProperty('db.name');
 const collectionName = prop.getProperty('db.accountsCollection');
 
 export class AccountsRepository {
-    static dbCollectionInsertOne = async (content: Bank) => {
+    static dbCollectionFindOne = async (bankId: ObjectId, accountId: ObjectId) => {
         const dbclient = new MongoClient(uri);
         try {
             const collection = dbclient.db(dbName).collection(collectionName);
-            return await collection.insertOne(content);
+            return await collection.find({_id: bankId, "accounts._id" : accountId }).toArray();
         } finally {
             dbclient.close();
         }
     }
 
-    static dbCollectionUpdateOne = async (_id: ObjectId, content: Bank) => {
+    static dbCollectionInsertOne = async (bankId: ObjectId, account: Account) => {
         const dbclient = new MongoClient(uri);
         try {
-            const collection = dbclient.db(dbName).collection(collectionName);
-            const updateContent = {
-                label: content.label,
-                color: content.color
+            const insertId = new ObjectId();
+            account._id = insertId;
+
+            let opResult: NestedInsertResult;
+
+            const collection: Collection<Bank> = dbclient.db(dbName).collection(collectionName);
+            opResult = {
+                result: await collection.updateOne({ _id: bankId }, { 
+                    $push: { 
+                        accounts: account
+                    } 
+                }),
+                insertId: insertId
             };
-            return await collection.updateOne({ _id: _id }, { $set: updateContent });
+            return opResult;
         } finally {
             dbclient.close();
         }
     }
 
-    static dbCollectionDeleteOne = async (_id: ObjectId) => {
+    static dbCollectionUpdateOne = async (bankId: ObjectId, accountId: ObjectId, account: Account) => {
         const dbclient = new MongoClient(uri);
         try {
             const collection = dbclient.db(dbName).collection(collectionName);
-            const result = await collection.deleteOne({ _id: _id });
-            return result.deletedCount;
+            account._id = accountId;
+            return await collection.updateOne({ _id: bankId, "accounts._id": accountId }, {
+                $set: {'accounts.$': account }
+            });
         } finally {
             dbclient.close();
         }
     }
+
+    static dbCollectionDeleteOne = async (bankId: ObjectId, accountId: ObjectId) => {
+        const dbclient = new MongoClient(uri);
+        try {
+            const collection: Collection<Bank> = dbclient.db(dbName).collection(collectionName);
+            const opResult = await collection.updateOne({ _id: bankId }, { 
+                $pull: { 
+                    accounts: { _id: new ObjectId(accountId) }
+                } 
+            });
+            return opResult;
+        } finally {
+            dbclient.close();
+        }
+    }
+}
+
+interface NestedInsertResult {
+    result: UpdateResult,
+    insertId: ObjectId
 }

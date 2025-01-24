@@ -13,12 +13,7 @@ export class BanksRepository {
         const dbclient = new MongoClient(uri);
         try {
             const collection = dbclient.db(dbName).collection(collectionName);
-            const cursor = collection.find();
-            let data: any = [];
-            for await (const doc of cursor) {
-                data.push(doc);
-            }
-            return data;
+            return await collection.find().toArray();
         } finally {
             dbclient.close();
         }

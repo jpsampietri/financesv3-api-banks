@@ -15,9 +15,9 @@ describe('BanksRepository', () => {
         });
     });
     describe('+dbCollectionFindAll()',  () => {
-        it('should return an array of length 1', async () => {
+        it('should return an array of length 2', async () => {
             const result = await BanksRepository.dbCollectionFindAll()
-            assert.lengthOf(result, 1);
+            assert.lengthOf(result, 2);
         });
     });
     describe('+dbCollectionFindOne()', () => {

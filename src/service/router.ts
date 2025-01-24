@@ -6,6 +6,8 @@ import { Properties } from './util/properties.js';
 import { Bank } from '../data/model/bank.js';
 import { ObjectId } from 'mongodb';
 import { BanksController } from './controller/banksController.js';
+import { AccountsController } from './controller/accountsController.js';
+import { Account } from '../data/model/account.js';
 
 const prop = Properties.instance;
 const banksPath = prop.getProperty('api.banksPath');
@@ -26,44 +28,54 @@ router.route(banksPath)
         }).catch(next);
     });
 
-router.use(`${banksPath}/:id`, validateRequestId);
-router.route(`${banksPath}/:id`)
+router.use(`${banksPath}/:bankId`, validateRequestId);
+router.route(`${banksPath}/:bankId`)
     .get((request: Request, response: Response, next: NextFunction) => {
-        BanksController.findOne(request.params.id).then((result: Bank) => {
+        BanksController.findOne(request.params.bankId).then((result: Bank) => {
             response.status(HTTPStatus.OK).json(result);
         }).catch(next);
     })
     .put(validateRequestBody)
     .put((request: Request, response: Response, next: NextFunction) => {
-        BanksController.updateOne(request.params.id, request.body).then((result: Bank) => {
+        BanksController.updateOne(request.params.bankId, request.body).then((result: Bank) => {
             response.status(HTTPStatus.OK).json(result);
         }).catch(next);
     })
     .delete((request: Request, response: Response, next: NextFunction) => {
-        BanksController.deleteOne(request.params.id).then((result: number) => {
+        BanksController.deleteOne(request.params.bankId).then((result: number) => {
             response.status(HTTPStatus.OK).json(result);
         }).catch(next);
     });
 
-router.use(`${banksPath}/:id${accountsPath}`, validateRequestId);
-router.route(`${banksPath}/:id${accountsPath}`)
+router.route(`${banksPath}/:bankId${accountsPath}`)
     .get((request: Request, response: Response, next: NextFunction) => {
-        BanksController.findOne(request.params.id).then((result: Bank) => {
+        AccountsController.findAll(request.params.bankId).then((result: Account[]) => {
             response.status(HTTPStatus.OK).json(result);
         }).catch(next);
     })
-    .put(validateRequestBody)
+    .post((request: Request, response: Response, next: NextFunction) => {
+        AccountsController.insertOne(request.params.bankId, request.body).then((result: Account) => {
+            response.status(HTTPStatus.CREATED).json(result);
+        }).catch(next);
+    });
+
+router.use(`${banksPath}/:bankId${accountsPath}/:accountId`, validateRequestId);
+router.route(`${banksPath}/:bankId${accountsPath}/:accountId`)
+    .get((request: Request, response: Response, next: NextFunction) => {
+        AccountsController.findOne(request.params.bankId, request.params.accountId).then((result: Account) => {
+            response.status(HTTPStatus.OK).json(result);
+        }).catch(next);
+    })
     .put((request: Request, response: Response, next: NextFunction) => {
-        BanksController.updateOne(request.params.id, request.body).then((result: Bank) => {
+        AccountsController.updateOne(request.params.bankId, request.params.accountId, request.body).then((result: Account) => {
             response.status(HTTPStatus.OK).json(result);
         }).catch(next);
     })
     .delete((request: Request, response: Response, next: NextFunction) => {
-        BanksController.deleteOne(request.params.id).then((result: number) => {
+        AccountsController.deleteOne(request.params.bankId, request.params.accountId).then((result: number) => {
             response.status(HTTPStatus.OK).json(result);
         }).catch(next);
     });
-
 
 router.use(banksPath, (request: Request, response: Response, next: NextFunction) => {
     throw new APIError(HTTPStatus.METHOD_NOT_ALLOWED, `Method ${request.method} not allowed`);
