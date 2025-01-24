@@ -1,9 +1,12 @@
+import { APIError } from "../../service/util/apiError.js";
+import { HTTPStatus } from "../../service/util/httpStatus.js";
 import { Properties } from "../../service/util/properties.js";
 import { Account, AccountType, CreditAccount, CurrentAccount, SavingsAccount } from "./account.js";
 import { APIMethod, APIResource } from "./apiResource.js";
 
 const prop = Properties.instance;
-const resourcePath = prop.getProperty('api.resourcePath');
+const banksPath = prop.getProperty('api.banksPath');
+const accountsPath = prop.getProperty('api.accountsPath');
 
 export class Bank extends APIResource {
     label: string;
@@ -31,19 +34,18 @@ export class Bank extends APIResource {
                         account = new SavingsAccount(a);
                         this.accounts.push(account);
                         break;
-
                     default:
-                        break;
+                        throw new APIError(HTTPStatus.INTERNAL_SERVER_ERROR, `Uknown account type ${a.type}`);
                 }
             });
         }
     }
 
     fillStandardLinks(): void {
-        super.fillStandardLinks(resourcePath);
-        super.addRelatedLink('/banks', 'related_accounts', APIMethod.GET, '/accounts');
+        super.fillStandardLinks(banksPath);
+        super.addRelatedLink(banksPath, 'related_accounts', APIMethod.GET, accountsPath);
         this.accounts.forEach((a: Account) => { 
-            a.fillStandardLinks('/accounts', `/banks/${this._id}`);
+            a.fillStandardLinks(accountsPath, `${banksPath}/${this._id}`);
         })
     }
 }

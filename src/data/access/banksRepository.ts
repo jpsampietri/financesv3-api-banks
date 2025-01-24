@@ -6,64 +6,61 @@ const prop = Properties.instance;
 
 const uri = prop.getProperty('db.uri');
 const dbName = prop.getProperty('db.name');
-const collectionName = prop.getProperty('db.collection');
+const collectionName = prop.getProperty('db.banksCollection');
 
-export const dbCollectionFindAll = async () => {
-    const dbclient = new MongoClient(uri);
-    try {
-        const collection = dbclient.db(dbName).collection(collectionName);
-        const cursor = collection.find();
-        let data: any = [];
-        for await (const doc of cursor) {
-            data.push(doc);
+export class BanksRepository {
+    static dbCollectionFindAll = async () => {
+        const dbclient = new MongoClient(uri);
+        try {
+            const collection = dbclient.db(dbName).collection(collectionName);
+            return await collection.find().toArray();
+        } finally {
+            dbclient.close();
         }
-        return data;
-    } finally {
-        dbclient.close();
     }
-}
 
-export const dbCollectionFindOne = async (_id: ObjectId) => {
-    const dbclient = new MongoClient(uri);
-    try {
-        const collection = dbclient.db(dbName).collection(collectionName);
-        return await collection.findOne({ _id: _id });
-    } finally {
-        dbclient.close();
+    static dbCollectionFindOne = async (_id: ObjectId) => {
+        const dbclient = new MongoClient(uri);
+        try {
+            const collection = dbclient.db(dbName).collection(collectionName);
+            return await collection.findOne({ _id: _id });
+        } finally {
+            dbclient.close();
+        }
     }
-}
 
-export const dbCollectionInsertOne = async (content: Bank) => {
-    const dbclient = new MongoClient(uri);
-    try {
-        const collection = dbclient.db(dbName).collection(collectionName);
-        return await collection.insertOne(content);
-    } finally {
-        dbclient.close();
+    static dbCollectionInsertOne = async (content: Bank) => {
+        const dbclient = new MongoClient(uri);
+        try {
+            const collection = dbclient.db(dbName).collection(collectionName);
+            return await collection.insertOne(content);
+        } finally {
+            dbclient.close();
+        }
     }
-}
 
-export const dbCollectionUpdateOne = async (_id: ObjectId, content: Bank) => {
-    const dbclient = new MongoClient(uri);
-    try {
-        const collection = dbclient.db(dbName).collection(collectionName);
-        const updateContent = { 
-            label: content.label,
-            color: content.color
-        };
-        return await collection.updateOne({ _id: _id }, { $set:  updateContent});
-    } finally {
-        dbclient.close();
+    static dbCollectionUpdateOne = async (_id: ObjectId, content: Bank) => {
+        const dbclient = new MongoClient(uri);
+        try {
+            const collection = dbclient.db(dbName).collection(collectionName);
+            const updateContent = {
+                label: content.label,
+                color: content.color
+            };
+            return await collection.updateOne({ _id: _id }, { $set: updateContent });
+        } finally {
+            dbclient.close();
+        }
     }
-}
 
-export const dbCollectionDeleteOne = async (_id: ObjectId) => {
-    const dbclient = new MongoClient(uri);
-    try {
-        const collection = dbclient.db(dbName).collection(collectionName);
-        const result = await collection.deleteOne({ _id: _id });
-        return result.deletedCount;
-    } finally {
-        dbclient.close();
+    static dbCollectionDeleteOne = async (_id: ObjectId) => {
+        const dbclient = new MongoClient(uri);
+        try {
+            const collection = dbclient.db(dbName).collection(collectionName);
+            const result = await collection.deleteOne({ _id: _id });
+            return result.deletedCount;
+        } finally {
+            dbclient.close();
+        }
     }
 }
